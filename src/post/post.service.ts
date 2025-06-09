@@ -52,28 +52,17 @@ export class PostService {
   async remove(id: number) {
     return this.postRepository.delete(id);
   }
-  async update(
-    postId: number,
-    updatePostDto: UpdatePostDto,
-    authorId: number,
-  ): Promise<PostDetailDto | null> {
-    const post = await this.postRepository.findOne({
-      where: { id: postId },
+  async updateSimple(id: number, updatePostDto: UpdatePostDto) {
+    // No ownership check needed - guard handles it
+    await this.postRepository.update(id, updatePostDto);
+
+    // Return the updated post with author relation
+    const updatedPost = await this.postRepository.findOne({
+      where: { id },
       relations: ['author'],
     });
 
-    if (!post) {
-      throw new NotFoundException(`Post with ID ${postId} not found.`);
-    }
-    if (post.authorId !== authorId) {
-      throw new ForbiddenException(
-        'You are not authorized to update this post.',
-      );
-    }
-    Object.assign(post, updatePostDto);
-    await this.postRepository.save(post);
-
-    return plainToClass(PostDetailDto, post, {
+    return plainToClass(PostDetailDto, updatedPost, {
       excludeExtraneousValues: true,
     });
   }
