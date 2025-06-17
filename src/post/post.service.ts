@@ -1,8 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 import { PostDetailDto } from './dto/post-detail.dto';
 import { plainToClass } from 'class-transformer';
 
@@ -46,5 +51,30 @@ export class PostService {
 
   async remove(id: number) {
     return this.postRepository.delete(id);
+  }
+  async update(
+    postId: number,
+    updatePostDto: UpdatePostDto,
+    authorId: number,
+  ): Promise<PostDetailDto | null> {
+    const post = await this.postRepository.findOne({
+      where: { id: postId },
+      relations: ['author'],
+    });
+
+    if (!post) {
+      throw new NotFoundException(`Post with ID ${postId} not found.`);
+    }
+    if (post.authorId !== authorId) {
+      throw new ForbiddenException(
+        'You are not authorized to update this post.',
+      );
+    }
+    Object.assign(post, updatePostDto);
+    await this.postRepository.save(post);
+
+    return plainToClass(PostDetailDto, post, {
+      excludeExtraneousValues: true,
+    });
   }
 }
