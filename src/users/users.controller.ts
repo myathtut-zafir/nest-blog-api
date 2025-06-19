@@ -9,7 +9,7 @@ import {
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtPayload } from 'src/iam/auth/jwt-payload.interface';
-import { Request as ExpressRequest } from 'express';
+// import { Request as ExpressRequest } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -22,8 +22,9 @@ export class UsersController {
   }
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
-  profile(@Request() req: ExpressRequest) {
-    const userPayload = req.user as JwtPayload;
+  profile(@Request() req: { user: JwtPayload }) {
+    // const userPayload = req.user as JwtPayload;
+    const userPayload = req.user;
 
     return this.usersService.getProfile(userPayload.userId);
   }
