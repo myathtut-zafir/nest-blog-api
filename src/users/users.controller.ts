@@ -23,9 +23,7 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
   profile(@Request() req: { user: JwtPayload }) {
-    // const userPayload = req.user as JwtPayload;
     const userPayload = req.user;
-
     return this.usersService.getProfile(userPayload.userId);
   }
 
