@@ -1,11 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { HashingService } from 'src/iam/hashing/hashing.service';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    private hashingService: HashingService,
+  ) {}
+  async create(createUserDto: CreateUserDto) {
+    try {
+      const user = new User();
+      user.name = createUserDto.name;
+      user.email = createUserDto.email;
+      user.password = await this.hashingService.hashPassword(
+        createUserDto.password,
+      );
+
+      return this.userRepository.save(user);
+    } catch (error) {
+      const pgUniqueViolaitonErrorCode = '23505';
+      if (error.code === pgUniqueViolaitonErrorCode)
+        throw new ConflictException();
+      throw error;
+    }
   }
 
   findAll() {

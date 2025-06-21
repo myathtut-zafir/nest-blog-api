@@ -14,5 +14,6 @@ import { BcryptService } from './hashing/bcrypt.service';
     ConfigModule.forFeature(jwtConfig),
   ],
   providers: [{ provide: HashingService, useClass: BcryptService }],
+  exports: [HashingService],
 })
 export class IamModule {}
