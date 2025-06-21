@@ -4,6 +4,7 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashingService } from 'src/iam/hashing/hashing.service';
 import { Repository } from 'typeorm';
+import { JwtPayload } from 'src/iam/auth/jwt-payload.interface';
 
 @Injectable()
 export class UsersService {
@@ -28,6 +29,13 @@ export class UsersService {
         throw new ConflictException();
       throw error;
     }
+  }
+
+  async getProfile(id: number) {
+    console.log('getProfile called with id:', id);
+    return this.userRepository.findOne({
+      where: { id },
+    });
   }
 
   findAll() {

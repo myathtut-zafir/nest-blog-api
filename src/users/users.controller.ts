@@ -1,6 +1,15 @@
-import { Controller, Param, Delete, Get, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Param,
+  Delete,
+  Get,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtPayload } from 'src/iam/auth/jwt-payload.interface';
+import { Request as ExpressRequest } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -11,10 +20,12 @@ export class UsersController {
   findAll() {
     return this.usersService.findAll();
   }
+  @UseGuards(AuthGuard('jwt'))
+  @Get('profile')
+  profile(@Request() req: ExpressRequest) {
+    const userPayload = req.user as JwtPayload;
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.getProfile(userPayload.userId);
   }
 
   // @Patch(':id')
