@@ -1,12 +1,13 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from '../iam/auth/dto/create-user.dto';
-import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashingService } from 'src/iam/hashing/hashing.service';
+import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
-export class UsersService {
+export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -29,20 +30,7 @@ export class UsersService {
       throw error;
     }
   }
-
-  findAll() {
-    return `This action returns all users`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  // update(id: number, updateUserDto: UpdateUserDto) {
-  //   return `This action updates a #${id} user`;
-  // }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  login(loginUserDto: LoginUserDto) {
+    throw new Error('Method not implemented.');
   }
 }

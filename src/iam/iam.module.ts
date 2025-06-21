@@ -6,6 +6,8 @@ import jwtConfig from './config/jwt.config';
 import { ConfigModule } from '@nestjs/config';
 import { HashingService } from './hashing/hashing.service';
 import { BcryptService } from './hashing/bcrypt.service';
+import { AuthService } from './auth/auth.service';
+import { AuthController } from './auth/auth.controller';
 
 @Module({
   imports: [
@@ -13,7 +15,11 @@ import { BcryptService } from './hashing/bcrypt.service';
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
   ],
-  providers: [{ provide: HashingService, useClass: BcryptService }],
-  exports: [HashingService],
+  providers: [
+    { provide: HashingService, useClass: BcryptService },
+    AuthService,
+  ],
+  controllers: [AuthController],
+  exports: [HashingService, AuthService],
 })
 export class IamModule {}
