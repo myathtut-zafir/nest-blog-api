@@ -25,6 +25,13 @@ export class AuthService {
   ) {}
   async create(createUserDto: CreateUserDto) {
     try {
+      const existingUser = await this.userRepository.findOne({
+        where: { email: createUserDto.email },
+      });
+
+      if (existingUser) {
+        throw new ConflictException('Email already exists');
+      }
       const user = new User();
       user.name = createUserDto.name;
       user.email = createUserDto.email;
