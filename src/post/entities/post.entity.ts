@@ -24,7 +24,7 @@ export class Post extends BaseEntity {
   published: boolean;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  featuredImage: string;
+  featuredImage: string | null;
 
   @Column({ name: 'authorId' })
   authorId: number;
