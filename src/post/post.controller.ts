@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Param,
+  ParseIntPipe,
   Post,
   Request,
   UseGuards,
@@ -26,7 +28,11 @@ export class PostController {
   }
 
   @Get(':id')
-  show(@Param('id') id: number) {
-    return this.postService.findOne(id);
+  async show(@Param('id', ParseIntPipe) id: number) {
+    const post = await this.postService.findOne(id);
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    return post;
   }
 }
