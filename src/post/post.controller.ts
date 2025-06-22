@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { JwtAuthGuard } from 'src/iam/auth/guards/jwt-auth.guard';
@@ -15,5 +23,10 @@ export class PostController {
     @Request() req: { user: JwtPayload },
   ) {
     return this.postService.create(createPostDto, req.user.userId);
+  }
+
+  @Get(':id')
+  show(@Param('id') id: number) {
+    return this.postService.findOne(id);
   }
 }
